@@ -1,0 +1,32 @@
+<!DOCTYPE html >  
+<html>  
+<head>  
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">  
+<title>Servlet-jCuckoo</title>  
+<script type="text/javascript" src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js"></script>  
+</head>  
+<body>  
+    <form >  
+        用户名：<input type="text" id="userName"/><br/>  
+        密码：<input type="password" id="userPwd"/><br/>  
+        <input type="button" value="登录" id="sender">   
+    </form>  
+    <div id="messageDiv"></div>  
+      
+    <script>  
+    $('#sender').click(function(){  
+        var userName=document.getElementById('userName').value;  
+        var userPwd=document.getElementById('userPwd').value;  
+        var user={userName:userName,userPwd:userPwd};  
+        var url="/ShiroServlet";  
+          
+        $.post(url, JSON.stringify(user), function(data) {  
+              console.log(data);  
+             $("#messageDiv").html(data);  
+             var json=JSON.parse(data);  
+             alert(json.message);  
+         });      
+    });  
+    </script>  
+</body>  
+</html>  
