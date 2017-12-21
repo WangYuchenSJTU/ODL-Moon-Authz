@@ -27,9 +27,8 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import java.net.URL;
-import java.util.*;
-import org.json.*;
-import java.io.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * Provides a dynamic authorization mechanism for restful web services from Moon platform
@@ -62,13 +61,13 @@ public class MoonAuthorizationFilter extends AuthorizationFilter {
         final Client client = Client.create(config);
         final WebResource webResource = client.resource(fullUrl);
         final ClientResponse response = webResource.type("application/json").get(ClientResponse.class);
-        final String output = response.getEntity(String.class);
-        final JSONTokener tokener = new JSONTokener(output);
-        final JSONObject object = new JSONObject(tokener);
+        final String resp = response.getEntity(String.class);
+	
+        final JsonObject jsonResp = new JsonParser().parse(resp).getAsJsonObject();
 
 	boolean result;
         try {
-            result = (Boolean) object.get("result");
+            result = jsonResp.get("result").getAsBoolean();
         } catch (NullPointerException e){
             return false;
         }
