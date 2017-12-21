@@ -19,11 +19,15 @@ sudo docker run --rm -it --name moon -p 31002:31002 wukongsun/moon_bouchon:v1.0
 ## MoonAuthorizationFilter
 Add the file: `/aaa/aaa-shiro/impl/src/main/java/org/opendaylight/aaa/impl/shiro/filters/`[MoonAuthorizationFilter.java](/aaa/aaa-shiro/impl/src/main/java/org/opendaylight/aaa/impl/shiro/filters/MoonAuthorizationFilter.java)
 
-Add two package dependicies in `/aaa/aaa-shiro/impl/`[pom.xml](/aaa/aaa-shiro/impl/pom.xml)
+Add package dependicies in `/aaa/aaa-shiro/impl/`[pom.xml](/aaa/aaa-shiro/impl/pom.xml)
 ```xml
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.7</version>
+        </dependency>
     <Import-Package>
         com.sun.jersey.*,
-        org.json.*,
     </Import-Package>
 ```
 
