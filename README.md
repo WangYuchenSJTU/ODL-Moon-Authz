@@ -24,7 +24,6 @@ Add package dependicies in `/aaa/aaa-shiro/impl/`[pom.xml](/aaa/aaa-shiro/impl/p
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.7</version>
         </dependency>
     <Import-Package>
         com.sun.jersey.*,
