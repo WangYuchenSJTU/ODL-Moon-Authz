@@ -37,9 +37,10 @@ import com.google.gson.JsonParser;
  */
 public class MoonAuthorizationFilter extends AuthorizationFilter {
 
-    private String moonServerURL = "http://localhost:31003";
-
     private static final Logger LOG = LoggerFactory.getLogger(MoonAuthorizationFilter.class);
+
+    private static final String DEFAULT_MOON_SERVER_URL = "http://localhost:31003";
+    private String moonServerURL = DEFAULT_MOON_SERVER_URL;
 
     @Override
     public boolean isAccessAllowed(final ServletRequest request, final ServletResponse response,
@@ -47,31 +48,31 @@ public class MoonAuthorizationFilter extends AuthorizationFilter {
         final Subject subject = getSubject(request, response);
         final ODLPrincipalImpl principal = (ODLPrincipalImpl) subject.getPrincipal();
         final String username = principal.getUsername();
-        final HttpServletRequest httpServletRequest = (HttpServletRequest)request;
-        final String requestURI = httpServletRequest.getRequestURI();
-        final String method = httpServletRequest.getMethod();
-        
-        return RestAuthorization(username, requestURI, method);
+        try {
+            final HttpServletRequest httpServletRequest = (HttpServletRequest)request;
+            final String requestURI = httpServletRequest.getRequestURI();
+            final String method = httpServletRequest.getMethod();
+            return restAuthorization(username, requestURI, method);
+        } catch (ClassCastException e){
+            LOG.debug("httpServletRequest ClassCastException for user={} to request={}", subject, request);
+            return false;
+        }
     }
 
-    private boolean RestAuthorization(final String username, final String requestURI, final String method) {
+    private boolean restAuthorization(final String username, final String requestURI, final String method) {
         final String fullUrl = String.format("%s/interface/authz/deny/project_id/%s/object_name/%s", moonServerURL, username, method);
-        //final String fullUrl = String.format("%s/interface/authz/grant/project_id/%s/object_name/%s", moonServerURL, username, method);
         final ClientConfig config = new DefaultClientConfig();
         final Client client = Client.create(config);
         final WebResource webResource = client.resource(fullUrl);
         final ClientResponse response = webResource.type("application/json").get(ClientResponse.class);
-        final String resp = response.getEntity(String.class);
-	
-        final JsonObject jsonResp = new JsonParser().parse(resp).getAsJsonObject();
-
-	boolean result;
+        final String stringResponse = response.getEntity(String.class);
+        final JsonObject jsonResp = new JsonParser().parse(stringResponse).getAsJsonObject();
         try {
-            result = jsonResp.get("result").getAsBoolean();
+            return jsonResp.get("result").getAsBoolean();
         } catch (NullPointerException e){
+            LOG.debug("Bad authorization response format form Moon server={}", fullUrl);
             return false;
         }
-        return result;
     }
 
      /**
